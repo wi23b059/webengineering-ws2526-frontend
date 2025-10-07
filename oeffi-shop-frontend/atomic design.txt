@@ -1,0 +1,48 @@
+
+Online Ticket Shop für Öffis
+
+Seiten:
+
+Startseite
+header (organism)
+
+Produktseite
+header (organism)
+- productCard (organism)
+- footer (organism)
+
+Warenkorb
+header (organism)
+
+Zahlung
+header (organism)
+
+Konto
+header (organism)
+
+Login
+header (organism)
+
+Käufe
+header (organism)
+
+Bestelldetails
+header (organism)
+
+Registrierung
+header (organism)
+
+Benutzerverwaltung
+header (organism)
+
+Produktverwaltung
+header (organism)
+
+
+footer (organism)
+- Impressum (atom)
+- Kontakt (atom)
+
+header (organism)
+- title (molecule)
+- navbar (molecule)
