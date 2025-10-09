@@ -1,48 +1,150 @@
-
-Online Ticket Shop für Öffis
+Öffi Ticket Shop
 
 Seiten:
+- Startseite
+- Produktseite
+- Warenkorb
+- Zahlung
+- Konto
+- Login
+- Käufe
+- Bestelldetails
+- Registrierung
+- Benutzerverwaltung
+- Produktverwaltung
+
+
+🔹 Atoms (kleinste, unteilbare Bausteine)
+
+Typografie & Grundelemente
+- Heading (z. B. <h1>, <h2>, <h3>)
+- Paragraph
+- Label
+- Link
+- Icon
+- Image
+- Divider
+- Badge (z. B. „Neu“, „Angebot“)
+
+Form Elements
+- InputText
+- InputPassword
+- InputEmail
+- InputNumber
+- Select
+- Checkbox
+- RadioButton
+- Textarea
+- ButtonPrimary
+- ButtonSecondary
+- ButtonIcon
+- FormErrorMessage
+- FormHintText
+- LoadingSpinner
+
+Layout & Content
+- CardContainer
+- ModalBackground
+- Tooltip
+- TableHeaderCell
+- TableCell
+
+Infos / Rechtliches
+- Impressum
+- Kontakt
+
+
+⚛️ Molecules (Kombination mehrerer Atoms mit Funktionalität)
+
+Navigation & Struktur
+- Navbar
+- SearchBar (Input + Button)
+- LanguageSelector
+- Breadcrumb
+- Pagination
+
+Formulare
+- LoginForm (InputEmail + InputPassword + Button + Fehlermeldung)
+- RegisterForm (mehrere Inputs + Validierung)
+- ProfileForm (Daten des Benutzers bearbeiten)
+- PaymentForm (Kreditkarte, PayPal o. Ä.)
+- AddressForm
+- CountrySelect (mit DACH oben sortiert)
+
+Shop / Produktbereich
+- ProductFilterBar (Dropdowns, Preisrange, Suchfeld)
+- ProductInfoBox (Titel, Preis, Beschreibung)
+- TicketOption (z. B. Einzelfahrt, Tageskarte, Wochenkarte)
+- QuantitySelector
+
+Warenkorb / Bestellungen
+- CartItemRow (Produktbild, Name, Preis, Menge, Entfernen)
+- OrderSummaryBox (Summe, Steuern, Versand)
+- OrderDetailInfo (Infos zu einer Bestellung)
+- PaymentOptionSelector
+
+Benutzer & Admin
+- UserCard (Name, Email, Rolle, Aktionen)
+- UserEditForm
+- UserSearchBar
+- ConfirmationDialog
+
+UI/Feedback
+- NotificationToast
+- ModalDialog
+- LoadingOverlay
+- ErrorBox
+
+
+🧩 Organisms (größere zusammenhängende Blöcke, eigene Logik)
+
+Allgemein
+- Header
+- Footer
+- HeroSection (großes Bild + Text + Call-to-Action)
+- SidebarMenu (für Konto/Admin)
+- AuthSection (Login oder Registrierung nebeneinander)
 
 Startseite
-header (organism)
+- FeaturedProductsSection (mehrere ProductCards)
+- PromoBanner (z. B. „Jetzt Monatskarte kaufen“)
+- NewsTicker (aktuelle Öffi-Infos)
 
 Produktseite
-header (organism)
-- productCard (organism)
-- footer (organism)
+- ProductCard
+- ProductList (mehrere ProductCards)
+- ProductDetailSection (Produktinfo + Optionen + Kaufen-Button)
+- ReviewSection (Bewertungen & Sterne)
+- FilterSidebar
 
 Warenkorb
-header (organism)
+- CartList (mehrere CartItemRows)
+- CartSummary (mit Gesamtpreis und Button „Zur Kasse“)
 
 Zahlung
-header (organism)
+- PaymentSection (PaymentForm + OrderSummaryBox)
+- OrderConfirmation (Erfolgsmeldung, Bestellnummer)
 
 Konto
-header (organism)
+- UserProfileSection
+- UserSettingsSection
+- ProfilePictureUpload
 
-Login
-header (organism)
+Käufe & Bestelldetails
+- PurchaseList (mehrere OrderSummaryBox Einträge)
+- OrderDetailsSection (Detailansicht einer Bestellung)
 
-Käufe
-header (organism)
+Login / Registrierung
+- LoginSection (LoginForm)
+- RegisterSection (RegisterForm + Hinweise)
 
-Bestelldetails
-header (organism)
+Benutzerverwaltung (Admin)
+- UserTable (Tabelle aller Benutzer mit Suche)
+- UserEditSection
+- UserRoleBadge
+- UserSearchResults
 
-Registrierung
-header (organism)
-
-Benutzerverwaltung
-header (organism)
-
-Produktverwaltung
-header (organism)
-
-
-footer (organism)
-- Impressum (atom)
-- Kontakt (atom)
-
-header (organism)
-- title (molecule)
-- navbar (molecule)
+Produktverwaltung (Admin)
+- ProductTable (Liste aller Produkte)
+- ProductEditForm
+- ProductCreateSection
