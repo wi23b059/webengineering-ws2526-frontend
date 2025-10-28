@@ -1,11 +1,25 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import Navbar from './components/atoms/Navbar.vue';
+import Imprint from './components/atoms/Imprint.vue';
+</script>
 
 <template>
-  <h1>You did it!</h1>
-  <p>
-    Visit <a href="https://vuejs.org/" target="_blank" rel="noopener">vuejs.org</a> to read the
-    documentation
-  </p>
+  <div>
+    <Navbar />
+
+    <main>
+      <RouterView />
+    </main>
+
+    <Imprint/>
+  </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+nav {
+  display: flex;
+  gap: 1rem;
+  padding: 0.5rem;
+  border-bottom: 1px solid #eee;
+}
+</style>
