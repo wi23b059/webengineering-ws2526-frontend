@@ -9,13 +9,13 @@ import { RouterLink } from 'vue-router'
     </span>
       <ul class="flex flex-wrap items-center mt-3 text-sm font-medium text-gray-500 dark:text-gray-400 sm:mt-0">
         <li>
-          <RouterLink to="/" class="hover:underline me-4 md:me-6">Über uns</RouterLink>
+          <RouterLink to="/help" class="hover:underline me-4 md:me-6">Hilfe</RouterLink>
         </li>
         <li>
           <RouterLink to="/" class="hover:underline me-4 md:me-6">AGBs</RouterLink>
         </li>
         <li>
-          <RouterLink to="/" class="hover:underline me-4 md:me-6">Impressum</RouterLink>
+          <RouterLink to="/imprint" class="hover:underline me-4 md:me-6">Impressum</RouterLink>
         </li>
       </ul>
     </div>

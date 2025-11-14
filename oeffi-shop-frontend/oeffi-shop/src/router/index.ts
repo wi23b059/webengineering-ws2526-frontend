@@ -4,6 +4,8 @@ const HomeView = () => import('@/views/HomeView.vue');
 const NotFoundView = () => import('@/views/NotFoundView.vue');
 const LoginView = () => import('@/views/LoginView.vue');
 const RegistrationView = () => import('@/views/RegistrationView.vue');
+const ImprintView = () => import('@/views/ImprintView.vue');
+const HelpView = () => import('@/views/HelpView.vue');
 
 const routes = [
   {
@@ -17,6 +19,14 @@ const routes = [
   {
     path: '/registration',
     component: RegistrationView,
+  },
+  {
+    path: '/imprint',
+    component: ImprintView,
+  },
+  {
+    path: '/help',
+    component: HelpView,
   },
   {
     path: '/:catchAll(.*)',
