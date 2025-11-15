@@ -6,6 +6,7 @@ const LoginView = () => import('@/views/LoginView.vue');
 const RegistrationView = () => import('@/views/RegistrationView.vue');
 const ImprintView = () => import('@/views/ImprintView.vue');
 const HelpView = () => import('@/views/HelpView.vue');
+const ProductsView =() => import('@/views/ProductsView.vue');
 
 const routes = [
   {
@@ -19,6 +20,10 @@ const routes = [
   {
     path: '/registration',
     component: RegistrationView,
+  },
+  {
+    path: '/products',
+    component: ProductsView,
   },
   {
     path: '/imprint',
