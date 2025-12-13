@@ -1,10 +1,33 @@
 <script setup lang="ts">
 defineOptions({ name: 'SiteNavbar' });
-import { RouterLink } from 'vue-router';
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { RouterLink, useRouter } from 'vue-router';
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
+import { useAuthStore } from '@/stores/authStore'
 
 const showDropdown = ref(false);
 const avatarWrapper = ref<HTMLElement | null>(null);
+const auth = useAuthStore()
+const isLoggedIn = computed(() => auth.isAuthenticated)
+const isAdmin = computed(() => auth.user?.role === 'ADMIN')
+const router = useRouter()
+const displayName = computed(() => auth.fullName)
+const email = computed(() => auth.user?.email)
+
+const avatarUrl = computed(() =>
+  auth.user?.profilePicturePath
+    ? auth.user.profilePicturePath
+    : '/src/docs/test_1.png'
+)
+
+function onLogout() {
+  const confirmed = window.confirm('Möchtest du dich wirklich ausloggen?')
+
+  if (confirmed) {
+    auth.logout()
+    showDropdown.value = false
+    router.push('/login')
+  }
+}
 
 function toggleDropdown() {
   showDropdown.value = !showDropdown.value;
@@ -48,13 +71,33 @@ onBeforeUnmount(() => {
           <li><RouterLink to="/about" class="py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white">Über uns</RouterLink></li>
           <li><RouterLink to="/products" class="py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white">Produkte</RouterLink></li>
           <li><RouterLink to="/cart" class="py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white">Warenkorb</RouterLink></li>
-          <li><RouterLink to="/login" class="py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white">Login</RouterLink></li>
-          <li><RouterLink to="/registration" class="py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white">Registrieren</RouterLink></li>
+          <li v-if="!isLoggedIn"><RouterLink to="/login" class="py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white">Login</RouterLink></li>
+          <li v-if="!isLoggedIn"><RouterLink to="/registration" class="py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white">Registrieren</RouterLink></li>
+          <li v-if="isLoggedIn && isAdmin">
+            <RouterLink
+              to="/admin/products"
+              class="py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white"
+            >
+              Produktübersicht
+            </RouterLink>
+          </li>
+
+          <li v-if="isLoggedIn && isAdmin">
+            <RouterLink
+              to="/admin/products/create"
+              class="py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white"
+            >
+              Produkt erstellen
+            </RouterLink>
+          </li>
+
         </ul>
       </div>
 
       <!-- RIGHT: User menu / Avatar -->
-      <div class="flex-shrink-0 flex items-center md:order-2 space-x-3">
+      <div
+        v-if="isLoggedIn"
+        class="flex-shrink-0 flex items-center md:order-2 space-x-3">
         <div class="relative" ref="avatarWrapper">
           <button
             type="button"
@@ -64,7 +107,11 @@ onBeforeUnmount(() => {
             @click.stop="toggleDropdown"
           >
             <span class="sr-only">Mein Konto</span>
-            <img class="w-8 h-8 rounded-full" src="/src/docs/I70A2681_resized.jpg" alt="user photo">
+            <img
+              class="w-8 h-8 rounded-full object-cover"
+              :src="avatarUrl"
+              alt="User Avatar"
+            >
           </button>
 
           <!-- Dropdown: v-show steuert Sichtbarkeit; bleibt im DOM für bessere Positionierung -->
@@ -74,13 +121,24 @@ onBeforeUnmount(() => {
             id="user-dropdown"
           >
             <div class="px-4 py-3">
-              <span class="block text-sm text-gray-900 dark:text-white">Bonnie Green</span>
-              <span class="block text-sm text-gray-500 truncate dark:text-gray-400">name@flowbite.com</span>
+              <span class="block text-sm text-gray-900 dark:text-white">
+                {{ displayName }}
+              </span>
+              <span class="block text-sm text-gray-500 truncate dark:text-gray-400">
+                {{ email }}
+              </span>
             </div>
             <ul class="py-2" aria-labelledby="user-menu-button">
-              <li><RouterLink to="/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200">Mein Profil</RouterLink></li>
+              <li><RouterLink to="/user-account" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200">Mein Profil</RouterLink></li>
               <li><RouterLink to="/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200">Bestellungen</RouterLink></li>
-              <li><RouterLink to="/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200">Ausloggen</RouterLink></li>
+              <li>
+                <button
+                  @click="onLogout"
+                  class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200"
+                >
+                  Ausloggen
+                </button>
+              </li>
             </ul>
           </div>
         </div>
