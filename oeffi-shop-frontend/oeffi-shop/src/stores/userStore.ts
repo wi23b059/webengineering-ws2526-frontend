@@ -124,6 +124,43 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
+  // Benutzer erstellen
+  async function createUser(password: string) {
+    loading.value = true
+    errorMessage.value = ''
+    successMessage.value = ''
+
+    try {
+      const payload = {
+        salutation: user.salutation,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        countryCode: user.countryCode,
+        address: user.address,
+        city: user.city,
+        zip: user.zip,
+        email: user.email,
+        username: user.username,
+        password
+      }
+      const resp = await api.post('/api/users', payload)
+      Object.assign(user, resp.data) // ID und evtl. andere Felder übernehmen
+      successMessage.value = 'Benutzer erfolgreich erstellt.'
+      return true
+    } catch (err: unknown) {
+      console.error(err)
+      const axiosErr = err as AxiosError<{ message?: string }>
+      if (axiosErr.response?.data?.message) {
+        errorMessage.value = axiosErr.response.data.message
+      } else {
+        errorMessage.value = 'Fehler beim Erstellen des Benutzers.'
+      }
+      return false
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     user,
     otherSalutation,
@@ -132,6 +169,7 @@ export const useUserStore = defineStore('user', () => {
     errorMessage,
     loadUser,
     saveUser,
-    deleteUser
+    deleteUser,
+    createUser
   }
 })

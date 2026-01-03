@@ -56,7 +56,7 @@ async function onSubmit() {
       }, 1200)
     } else {
       // serverseitige Fehlermeldung wird bereits in auth.error angezeigt
-      // optional: kannst du hier noch feld-spezifisch parsen, falls das Backend field errors zurückliefert
+      // optional: feld-spezifisch parsen, falls das Backend field errors zurückliefert
     }
   } catch (err: unknown) {
     // Yup validation errors — typsicher behandeln

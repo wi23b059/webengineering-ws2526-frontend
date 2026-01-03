@@ -1,17 +1,27 @@
 import * as yup from "yup";
 
 export const registrationSchema = yup.object({
-  salutation: yup.string().required("Bitte eine Anrede auswählen"),
+  salutation: yup
+    .string()
+    .oneOf(["MR", "MS", "MRS", "MX"], "Ungültige Anrede")
+    .required("Bitte eine Anrede auswählen"),
   otherSalutation: yup
     .string()
     .when("salutation", {
-      is: "OTHER",
+      is: "MX",
       then: (schema) =>
-        schema.required("Bitte geben Sie eine Anrede ein").max(30, "Maximal 30 Zeichen"),
+        schema
+          .required("Bitte geben Sie eine Anrede ein")
+          .max(30, "Maximal 30 Zeichen"),
       otherwise: (schema) => schema.strip(),
     }),
-  email: yup.string().email("Bitte eine gültige E-Mail-Adresse eingeben").required("E-Mail ist erforderlich"),
-  username: yup.string().required("Benutzername darf nicht leer sein"),
+  email: yup
+    .string()
+    .email("Bitte eine gültige E-Mail-Adresse eingeben")
+    .required("E-Mail ist erforderlich"),
+  username: yup
+    .string()
+    .required("Benutzername darf nicht leer sein"),
   password: yup
     .string()
     .required("Passwort ist erforderlich")
@@ -24,5 +34,7 @@ export const registrationSchema = yup.object({
     .string()
     .oneOf([yup.ref("password")], "Passwörter müssen übereinstimmen")
     .required("Bitte Passwort bestätigen"),
-  country: yup.string().required("Bitte ein Land auswählen"),
+  country: yup
+    .string()
+    .required("Bitte ein Land auswählen"),
 });

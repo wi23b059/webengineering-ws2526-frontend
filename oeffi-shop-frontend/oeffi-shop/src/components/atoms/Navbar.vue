@@ -13,11 +13,11 @@ const router = useRouter()
 const displayName = computed(() => auth.fullName)
 const email = computed(() => auth.user?.email)
 
-const avatarUrl = computed(() =>
-  auth.user?.profilePicturePath
-    ? auth.user.profilePicturePath
-    : '/src/docs/test_1.png'
-)
+const avatarUrl = computed(() => {
+  return auth.user?.profilePicturePath
+    ? `/public/docs/${auth.user.profilePicturePath}`
+    : '/public/docs/test_1.png'
+})
 
 function onLogout() {
   const confirmed = window.confirm('Möchtest du dich wirklich ausloggen?')

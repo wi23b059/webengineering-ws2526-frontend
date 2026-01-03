@@ -16,6 +16,8 @@ export interface Product {
 export const useProductStore = defineStore('product', () => {
   const products = ref<Product[]>([])
   const selectedProduct = ref<Product | null>(null)
+  const categories = ref<any[]>([])
+  const selectedCategory = ref<number | null>(null)
   const loading = ref(false)
   const errorMessage = ref('')
 
@@ -74,13 +76,39 @@ export const useProductStore = defineStore('product', () => {
     }
   }
 
+  async function fetchCategories() {
+    try {
+      const resp = await api.get('/api/categories')
+      categories.value = resp.data
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  async function fetchProductsByCategory(categoryId: number | null) {
+    loading.value = true
+    try {
+      const url = categoryId
+        ? `/api/products?category=${categoryId}`
+        : `/api/products`
+      const resp = await api.get<Product[]>(url)
+      products.value = resp.data
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     products,
+    categories,
+    selectedCategory,
     selectedProduct,
     loading,
     errorMessage,
     fetchProducts,
     fetchProduct,
     saveProduct,
+    fetchProductsByCategory,
+    fetchCategories,
   }
 })

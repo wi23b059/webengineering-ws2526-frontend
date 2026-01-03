@@ -12,14 +12,10 @@ const props = defineProps({
 
 // Bildloader für /src/docs/
 const getImage = (filename?: string) => {
-  if (!filename) return new URL("../../docs/fallback.jpg", import.meta.url).href;
+  if (!filename) return '/docs/fallback.png'
 
-  try {
-    const cleanName = filename.split("/").pop();
-    return new URL(`../../docs/${cleanName}`, import.meta.url).href;
-  } catch {
-    return new URL("../../docs/fallback.jpg", import.meta.url).href;
-  }
+  const cleanName = filename.split('/').pop()
+  return `/docs/${cleanName}`
 };
 </script>
 

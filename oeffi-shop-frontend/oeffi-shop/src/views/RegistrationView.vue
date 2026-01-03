@@ -1,17 +1,28 @@
 <script setup lang="ts">
 import { reactive, ref, computed } from 'vue'
-import axios, { AxiosError } from 'axios'
 import * as yup from 'yup'
 import type { ValidationError } from 'yup'
 import { registrationSchema } from '@/validation/registrationSchema'
 import { useRouter } from 'vue-router'
+import { useUserStore } from '@/stores/userStore'
 
 const router = useRouter()
 const successMessage = ref<string | null>(null)
+const userStore = useUserStore()
 
 interface ApiErrorResponse {
   message?: string
   errors?: Record<string, string>
+}
+
+// ---------------------------------------------
+// Salutation mappen
+// ---------------------------------------------
+function getSalutationValue(): 'MR' | 'MS' | 'MRS' | 'MX' {
+  if (form.salutation === 'MX') return 'MX'
+  if (form.salutation === 'MRS') return 'MRS'
+  if (form.salutation === 'MS') return 'MS'
+  return 'MR'
 }
 
 // ---------------------------------------------
@@ -65,102 +76,43 @@ async function registerUser() {
   (Object.keys(errors) as FormKeys[]).forEach((k) => {
     delete errors[k]
   })
-  try {
-    // 1. Frontend-Validierung via Yup
-    // registrationSchema sollte ein yup-Object sein, das dem 'form' shape entspricht
-    const validData = await registrationSchema.validate(form, {
-      abortEarly: false
-    })
+  // Frontend-Validierung via Yup
+  const validData = await registrationSchema.validate(form, {
+    abortEarly: false
+  })
 
-    console.log('VALID:', validData)
+  console.log('VALID:', validData)
 
-    // 2. Beispiel: statische Mock-Prüfung (z. B. ob Username schon existiert)
-    const existingUsernames = ['admin', 'max', 'test123']
-    if (existingUsernames.includes(form.username)) {
-      errors.username = 'Benutzername existiert bereits'
-      return
-    }
+  // Formularwerte in den Store kopieren
+  Object.assign(userStore.user, {
+    salutation: getSalutationValue(),
+    firstName: 'Vorname',
+    lastName: 'Nachname',
+    countryCode: countryMap[form.country],
+    address: 'Adresse',
+    city: 'Stadt',
+    zip: '0000',
+    email: form.email,
+    username: form.username,
+  })
 
-    if (!agreeTerms.value) {
-      // Falls Terms nicht akzeptiert wurden
-      errors.otherSalutation = 'Bitte akzeptieren Sie die AGBs' // oder ein besseres Feld, z.B. 'terms'
-      return
-    }
+  if (form.salutation === 'MX') {
+    userStore.otherSalutation = form.otherSalutation
+  }
 
-    // 3. POST-Request an dein Backend
-    const payload = {
-      salutation: form.salutation,
-      firstName: 'Vorname',
-      lastName: 'Nachname',
-      countryCode: countryMap[form.country],
-      address: 'Adresse',
-      city: 'Stadt',
-      zip: '00000',
-      email: form.email,
-      username: form.username,
-      password: form.password
-    }
+  // User über den Store erstellen
+  if (!agreeTerms.value) {
+    errors.otherSalutation = 'Bitte akzeptieren Sie die AGBs'
+    return
+  }
 
-    const response = await axios.post('http://localhost:8081/api/users', payload)
-
-    console.log('User erfolgreich angelegt:', response.data)
-
-    // Erfolg
+  const success = await userStore.createUser(form.password)
+  if (success) {
     successMessage.value = 'Benutzer erfolgreich erstellt!'
-
-    setTimeout(() => {
-      router.push('/login')
-    }, 1200)
-
-  } catch (err: unknown) {
-    // Yup validation errors — typsicher behandeln
-    if (err instanceof yup.ValidationError) {
-      const ve = err as ValidationError
-      // ve.inner ist Array<ValidationError>
-      ve.inner.forEach((e) => {
-        const path = e.path as FormKeys | undefined
-        if (path) {
-          errors[path] = e.message
-        }
-      })
-      return
-    }
-
-    // Axios Fehler behandeln
-    if ((err as AxiosError).isAxiosError) {
-      const ace = err as AxiosError
-      const status = ace.response?.status
-      const data = ace.response?.data as ApiErrorResponse | undefined
-
-      if (status === 409) {
-        // Backend wirft z. B. EmailAlreadyExistsException
-        if (typeof data?.message === 'string') {
-          if (data.message.toLowerCase().includes('email')) {
-            errors.email = data.message
-          } else if (data.message.toLowerCase().includes('username')) {
-            errors.username = data.message
-          } else {
-            errors.otherSalutation = data.message
-          }
-        } else {
-          errors.otherSalutation = 'Benutzer existiert bereits'
-        }
-        return
-      }
-
-      errors.otherSalutation = ace.message ?? 'Serverfehler'
-      return
-    }
-
-
-    // Sonstige Fehler
-    if (err instanceof Error) {
-      errors.otherSalutation = err.message
-    } else {
-      errors.otherSalutation = String(err)
-    }
-
-    console.error('Registrierungsfehler:', err)
+    console.log('User erfolgreich angelegt:', userStore.user)
+    setTimeout(() => router.push('/login'), 1200)
+  } else {
+    errors.otherSalutation = userStore.errorMessage || 'Fehler bei der Registrierung'
   }
 }
 </script>
@@ -196,7 +148,7 @@ async function registerUser() {
 
             <div v-if="form.salutation === 'MX'">
               <label for="salutation_other" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Andere Anrede</label>
-              <input v-model="form.otherSalutation" type="text" id="salutation_other" name="salutation_other" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-slate-600 focus:border-slate-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Andere Anrede" required />
+              <input v-model="form.otherSalutation" type="text" id="salutation_other" name="salutation_other" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-slate-600 focus:border-slate-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Andere Anrede" maxlength="30" required />
               <p v-if="errors.otherSalutation" class="text-red-500">{{ errors.otherSalutation }}</p>
             </div>
 
