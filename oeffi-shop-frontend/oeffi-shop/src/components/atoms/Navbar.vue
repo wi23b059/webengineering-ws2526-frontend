@@ -5,6 +5,8 @@ import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
 import { useAuthStore } from '@/stores/authStore'
 
 const showDropdown = ref(false);
+const showProductsDropdown = ref(false)
+const showUsersDropdown = ref(false)
 const avatarWrapper = ref<HTMLElement | null>(null);
 const auth = useAuthStore()
 const isLoggedIn = computed(() => auth.isAuthenticated)
@@ -37,11 +39,28 @@ function closeDropdown() {
   showDropdown.value = false;
 }
 
+function toggleProductsDropdown() {
+  showProductsDropdown.value = !showProductsDropdown.value
+  showUsersDropdown.value = false
+}
+
+function toggleUsersDropdown() {
+  showUsersDropdown.value = !showUsersDropdown.value
+  showProductsDropdown.value = false
+}
+
+function closeAdminDropdowns() {
+  showProductsDropdown.value = false
+  showUsersDropdown.value = false
+}
+
 function onDocClick(e: MouseEvent) {
   const target = e.target as Node;
   if (avatarWrapper.value && !avatarWrapper.value.contains(target)) {
-    closeDropdown();
+    return
   }
+  closeDropdown()
+  closeAdminDropdowns()
 }
 
 onMounted(() => {
@@ -73,24 +92,76 @@ onBeforeUnmount(() => {
           <li><RouterLink to="/cart" class="py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white">Warenkorb</RouterLink></li>
           <li v-if="!isLoggedIn"><RouterLink to="/login" class="py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white">Login</RouterLink></li>
           <li v-if="!isLoggedIn"><RouterLink to="/registration" class="py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white">Registrieren</RouterLink></li>
-          <li v-if="isLoggedIn && isAdmin">
-            <RouterLink
-              to="/admin/products"
-              class="py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white"
+          <li
+            v-if="isLoggedIn && isAdmin"
+            class="relative"
+          >
+            <button
+              @click.stop="toggleProductsDropdown"
+              class="flex items-center py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white"
             >
-              Produktübersicht
-            </RouterLink>
-          </li>
+              Produkte
+              <svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.25a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z"/>
+              </svg>
+            </button>
 
-          <li v-if="isLoggedIn && isAdmin">
-            <RouterLink
-              to="/admin/products/create"
-              class="py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white"
+            <div
+              v-show="showProductsDropdown"
+              class="absolute z-40 mt-2 w-48 bg-white dark:bg-gray-700 rounded-lg shadow-md"
             >
-              Produkt erstellen
-            </RouterLink>
-          </li>
+              <RouterLink
+                to="/admin/products"
+                class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200"
+                @click="closeAdminDropdowns"
+              >
+                Produktübersicht
+              </RouterLink>
 
+              <RouterLink
+                to="/admin/products/create"
+                class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200"
+                @click="closeAdminDropdowns"
+              >
+                Produkt erstellen
+              </RouterLink>
+            </div>
+          </li>
+          <li
+            v-if="isLoggedIn && isAdmin"
+            class="relative"
+          >
+            <button
+              @click.stop="toggleUsersDropdown"
+              class="flex items-center py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white"
+            >
+              Benutzer
+              <svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.25a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z"/>
+              </svg>
+            </button>
+
+            <div
+              v-show="showUsersDropdown"
+              class="absolute z-40 mt-2 w-48 bg-white dark:bg-gray-700 rounded-lg shadow-md"
+            >
+              <RouterLink
+                to="/admin/users"
+                class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200"
+                @click="closeAdminDropdowns"
+              >
+                Benutzerübersicht
+              </RouterLink>
+
+              <RouterLink
+                to="/admin/users/create"
+                class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200"
+                @click="closeAdminDropdowns"
+              >
+                Benutzer erstellen
+              </RouterLink>
+            </div>
+          </li>
         </ul>
       </div>
 

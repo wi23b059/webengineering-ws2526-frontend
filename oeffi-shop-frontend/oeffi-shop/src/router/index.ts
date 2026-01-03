@@ -3,15 +3,20 @@ import { useAuthStore } from '@/stores/authStore';
 
 const HomeView = () => import('@/views/HomeView.vue');
 const NotFoundView = () => import('@/views/NotFoundView.vue');
-const LoginView = () => import('@/views/LoginView.vue');
-const RegistrationView = () => import('@/views/RegistrationView.vue');
+const LoginView = () => import('@/views/AuthView/LoginView.vue');
+const RegistrationView = () => import('@/views/AuthView/RegistrationView.vue');
 const ImprintView = () => import('@/views/ImprintView.vue');
 const HelpView = () => import('@/views/HelpView.vue');
-const ProductsView =() => import('@/views/ProductsView.vue');
-const UserAccountView = () => import('@/views/UserAccountView.vue');
-const ProductAdministrationView = () => import('@/views/ProductAdministrationView.vue');
-const ProductCreateView = () => import('@/views/ProductCreateView.vue');
-const ProductEditView = () => import('@/views/ProductEditView.vue');
+const ProductsView =() => import('@/views/ProductView/ProductsView.vue');
+const UserAccountView = () => import('@/views/UserView/UserAccountView.vue');
+const ProductAdministrationView = () => import('@/views/ProductView/ProductAdministrationView.vue');
+const ProductCreateView = () => import('@/views/ProductView/ProductCreateView.vue');
+const ProductEditView = () => import('@/views/ProductView/ProductEditView.vue');
+const ProductDetailsView = () => import('@/views/ProductView/ProductDetailsView.vue');
+const UserAdministrationView = () => import('@/views/UserView/UserAdministrationView.vue');
+const UserEditView = () => import('@/views/UserView/UserEditView.vue');
+const UserCreateView = () => import('@/views/UserView/UserCreateView.vue');
+const UserDetailsView = () => import('@/views/UserView/UserDetailsView.vue');
 
 const routes = [
   {
@@ -61,9 +66,54 @@ const routes = [
     },
   },
   {
+    path: '/admin/products/:id/details',
+    name: 'ProductDetailsView',
+    component: ProductDetailsView,
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: true,
+    },
+  },
+  {
     path: '/admin/products/:id',
     name: 'ProductEditView',
     component: ProductEditView,
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: true
+    },
+  },
+  {
+    path: '/admin/users',
+    name: 'UserAdministrationView',
+    component: UserAdministrationView,
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: true,
+    },
+  },
+  {
+    path: '/admin/users/create',
+    name: 'UserCreateView',
+    component: UserCreateView,
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: true,
+    },
+  },
+  {
+    path: '/admin/users/:id/details',
+    name: 'UserDetailsView',
+    component: UserDetailsView,
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: true,
+    },
+  },
+  {
+    path: '/admin/users/:id',
+    name: 'UserEditView',
+    component: UserEditView,
     meta: {
       requiresAuth: true,
       requiresAdmin: true

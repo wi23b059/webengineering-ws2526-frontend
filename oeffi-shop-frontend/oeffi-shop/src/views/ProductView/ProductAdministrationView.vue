@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
-import { useProductStore } from '@/stores/productStore'
+import { ref, onMounted } from 'vue'
+import { useProductStore } from '@/stores/productStore.ts'
 import { useRouter } from 'vue-router'
+import DeleteProductModal from '@/components/atoms/DeleteProductModal.vue'
 
 const productStore = useProductStore()
 const router = useRouter()
+const showDeleteModal = ref(false)
+const productToDeleteId = ref<number | null>(null)
 
 onMounted(() => {
   productStore.fetchProducts()
@@ -12,6 +15,23 @@ onMounted(() => {
 
 function editProduct(id: number) {
   router.push(`/admin/products/${id}`)
+}
+
+function viewProductDetails(id: number) {
+  router.push(`/admin/products/${id}/details`)
+}
+
+function openDeleteModal(id: number) {
+  productToDeleteId.value = id
+  showDeleteModal.value = true
+}
+
+async function confirmDelete() {
+  if (!productToDeleteId.value) return
+
+  await productStore.deleteProduct(productToDeleteId.value)
+  showDeleteModal.value = false
+  productToDeleteId.value = null
 }
 </script>
 
@@ -37,7 +57,7 @@ function editProduct(id: number) {
               <th class="px-4 py-2 border">Name</th>
               <th class="px-4 py-2 border">Preis</th>
               <th class="px-4 py-2 border">Kategorie</th>
-              <th class="px-4 py-2 border">Aktion</th>
+              <th class="px-4 py-2 border">Aktionen</th>
             </tr>
             </thead>
             <tbody>
@@ -47,15 +67,37 @@ function editProduct(id: number) {
               <td class="px-4 py-2 border">{{ p.categoryName }}</td>
               <td class="px-4 py-2 border">
                 <button
-                  class="text-slate-600 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white font-medium"
+                  class="text-slate-600 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white font-medium mr-2"
+
+                  @click="viewProductDetails(p.id)"
+                >
+                  Details
+                </button>
+
+                <button
+                  class="text-slate-600 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white font-medium mr-2"
                   @click="editProduct(p.id)"
                 >
                   Bearbeiten
+                </button>
+
+                <button
+                  class="text-red-600 hover:text-red-800 font-medium"
+                  @click="openDeleteModal(p.id)"
+                >
+                  Löschen
                 </button>
               </td>
             </tr>
             </tbody>
           </table>
+
+          <DeleteProductModal
+            :open="showDeleteModal"
+            @confirm="confirmDelete"
+            @cancel="showDeleteModal = false"
+          />
+
         </div>
       </div>
     </div>

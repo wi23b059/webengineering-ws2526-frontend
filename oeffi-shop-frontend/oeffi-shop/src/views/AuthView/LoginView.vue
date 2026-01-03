@@ -3,7 +3,7 @@ import { ref, reactive } from 'vue'
 import * as yup from 'yup'
 import type { ValidationError } from 'yup'
 import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/authStore'
+import { useAuthStore } from '@/stores/authStore.ts'
 
 // Felder
 const emailOrUsername = ref('')

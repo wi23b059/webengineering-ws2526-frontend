@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import api from '../services/api'
+import api, { API_BASE_URL } from '../services/api'
 
 export interface Product {
   id: number
@@ -52,11 +52,23 @@ export const useProductStore = defineStore('product', () => {
   }
 
   // Produkt speichern
-  async function saveProduct(product: Product, isNew = false) {
+  async function saveProduct(product: Product & { imageFile?: File }, isNew = false) {
     loading.value = true
     errorMessage.value = ''
 
     try {
+      // 1. Image upload, falls vorhanden
+      if (product.imageFile) {
+        const formData = new FormData()
+        formData.append('file', product.imageFile)
+
+        const uploadResp = await api.post('/api/files/upload', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        })
+        product.imagePath = uploadResp.data // objectKey vom Backend
+      }
+
+      // 2. Produkt speichern (PUT oder POST)
       let resp
       if (isNew) {
         // ✅ POST für neue Produkte
@@ -98,6 +110,28 @@ export const useProductStore = defineStore('product', () => {
     }
   }
 
+  function getProductImageUrl(product?: Product | null) {
+    if (!product?.imagePath) return ''
+    return `${API_BASE_URL}/api/files/${product.imagePath}`
+  }
+
+  async function deleteProduct(id: number) {
+    loading.value = true
+    errorMessage.value = ''
+    try {
+      await api.delete(`/api/products/${id}`)
+      // lokal aus der Liste entfernen
+      products.value = products.value.filter(p => p.id !== id)
+      return true
+    } catch (err) {
+      console.error(err)
+      errorMessage.value = 'Produkt konnte nicht gelöscht werden.'
+      return false
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     products,
     categories,
@@ -110,5 +144,7 @@ export const useProductStore = defineStore('product', () => {
     saveProduct,
     fetchProductsByCategory,
     fetchCategories,
+    getProductImageUrl,
+    deleteProduct,
   }
 })

@@ -2,9 +2,9 @@
 import { reactive, ref, computed } from 'vue'
 import * as yup from 'yup'
 import type { ValidationError } from 'yup'
-import { registrationSchema } from '@/validation/registrationSchema'
+import { registrationSchema } from '@/validation/registrationSchema.ts'
 import { useRouter } from 'vue-router'
-import { useUserStore } from '@/stores/userStore'
+import { useUserStore } from '@/stores/userStore.ts'
 
 const router = useRouter()
 const successMessage = ref<string | null>(null)
