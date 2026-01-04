@@ -10,12 +10,9 @@ const props = defineProps({
   link: { type: String, default: "#" },
 });
 
-// Bildloader für /src/docs/
 const getImage = (filename?: string) => {
   if (!filename) return '/docs/fallback.png'
-
-  const cleanName = filename.split('/').pop()
-  return `/docs/${cleanName}`
+  return filename
 };
 </script>
 

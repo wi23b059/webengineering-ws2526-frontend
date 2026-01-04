@@ -127,41 +127,7 @@ onBeforeUnmount(() => {
               </RouterLink>
             </div>
           </li>
-          <li
-            v-if="isLoggedIn && isAdmin"
-            class="relative"
-          >
-            <button
-              @click.stop="toggleUsersDropdown"
-              class="flex items-center py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white"
-            >
-              Benutzer
-              <svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.25a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z"/>
-              </svg>
-            </button>
-
-            <div
-              v-show="showUsersDropdown"
-              class="absolute z-40 mt-2 w-48 bg-white dark:bg-gray-700 rounded-lg shadow-md"
-            >
-              <RouterLink
-                to="/admin/users"
-                class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200"
-                @click="closeAdminDropdowns"
-              >
-                Benutzerübersicht
-              </RouterLink>
-
-              <RouterLink
-                to="/admin/users/create"
-                class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200"
-                @click="closeAdminDropdowns"
-              >
-                Benutzer erstellen
-              </RouterLink>
-            </div>
-          </li>
+          <li v-if="isLoggedIn && isAdmin"><RouterLink to="/admin/users" class="py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white">Benutzerübersicht</RouterLink></li>
         </ul>
       </div>
 

@@ -28,6 +28,12 @@ export const useProductStore = defineStore('product', () => {
     try {
       const resp = await api.get<Product[]>('/api/products')
       products.value = resp.data
+
+      // Vollständige Bild-URLs setzen
+      products.value.forEach(p => {
+        p.imagePath = `${API_BASE_URL}/api/files/${p.imagePath}`
+      })
+
     } catch (err) {
       console.error(err)
       errorMessage.value = 'Produkte konnten nicht geladen werden.'
@@ -105,6 +111,14 @@ export const useProductStore = defineStore('product', () => {
         : `/api/products`
       const resp = await api.get<Product[]>(url)
       products.value = resp.data
+
+      // Vollständige Bild-URLs setzen
+      products.value.forEach(p => {
+        console.log("Vorher: " + p.imagePath);
+        p.imagePath = `${API_BASE_URL}/api/files/${p.imagePath}`
+        console.log("Nachher: " + p.imagePath);
+      })
+
     } finally {
       loading.value = false
     }

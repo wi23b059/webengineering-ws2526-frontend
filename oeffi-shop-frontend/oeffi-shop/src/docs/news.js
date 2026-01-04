@@ -6,19 +6,19 @@ export const news = [
     link: '/'
   },
   {
-    image: '/src/docs/tram_2.png',
+    image: '/src/docs/news_1.png',
     category: 'Modernisierung',
     title: 'Erste Straßenbahn der neuen Flexity-Generation geht in Betrieb',
     link: '/'
   },
   {
-    image: '/src/docs/tram_1.png',
+    image: '/src/docs/tram_2.png',
     category: 'Nachhaltigkeit',
     title: 'Wiener Öffis stellen auf 100% Ökostrom um',
     link: '/'
   },
   {
-    image: '/src/docs/tram_2.png',
+    image: '/src/docs/news_2.png',
     category: 'Bauarbeiten',
     title: 'U1 Modernisierung: Ersatzverkehr zwischen Reumannplatz und Alaudagasse',
     link: '/'
@@ -30,9 +30,27 @@ export const news = [
     link: '/'
   },
   {
-    image: '/src/docs/tram_2.png',
+    image: '/src/docs/news_1.png',
     category: 'Sicherheit',
     title: 'Mehr Sicherheitspersonal während Großveranstaltungen',
+    link: '/'
+  },
+  {
+    image: '/src/docs/tram_2.png',
+    category: 'Service',
+    title: 'Barrierefreie Haltestellen: Weitere Umbauten bis Jahresende geplant',
+    link: '/'
+  },
+  {
+    image: '/src/docs/news_2.png',
+    category: 'Personal',
+    title: 'Neue Fahrer:innen-Ausbildung startet mit Fokus auf Kund:innenservice',
+    link: '/'
+  },
+  {
+    image: '/src/docs/tram_1.png',
+    category: 'Infrastruktur',
+    title: 'Sanierung wichtiger Gleisabschnitte startet in den Sommermonaten',
     link: '/'
   }
 ]

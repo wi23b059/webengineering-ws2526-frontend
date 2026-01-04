@@ -14,8 +14,7 @@ const ProductCreateView = () => import('@/views/ProductView/ProductCreateView.vu
 const ProductEditView = () => import('@/views/ProductView/ProductEditView.vue');
 const ProductDetailsView = () => import('@/views/ProductView/ProductDetailsView.vue');
 const UserAdministrationView = () => import('@/views/UserView/UserAdministrationView.vue');
-const UserEditView = () => import('@/views/UserView/UserEditView.vue');
-const UserCreateView = () => import('@/views/UserView/UserCreateView.vue');
+const UserEditView = () => import('@/views/UserEditView/UserEditView.vue');
 const UserDetailsView = () => import('@/views/UserView/UserDetailsView.vue');
 
 const routes = [
@@ -93,9 +92,9 @@ const routes = [
     },
   },
   {
-    path: '/admin/users/create',
-    name: 'UserCreateView',
-    component: UserCreateView,
+    path: '/admin/users/:id',
+    name: 'UserEditView',
+    component: UserEditView,
     meta: {
       requiresAuth: true,
       requiresAdmin: true,
@@ -108,15 +107,6 @@ const routes = [
     meta: {
       requiresAuth: true,
       requiresAdmin: true,
-    },
-  },
-  {
-    path: '/admin/users/:id',
-    name: 'UserEditView',
-    component: UserEditView,
-    meta: {
-      requiresAuth: true,
-      requiresAdmin: true
     },
   },
   {
