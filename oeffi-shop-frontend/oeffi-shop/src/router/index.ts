@@ -14,7 +14,7 @@ const ProductCreateView = () => import('@/views/ProductView/ProductCreateView.vu
 const ProductEditView = () => import('@/views/ProductView/ProductEditView.vue');
 const ProductDetailsView = () => import('@/views/ProductView/ProductDetailsView.vue');
 const UserAdministrationView = () => import('@/views/UserView/UserAdministrationView.vue');
-const UserEditView = () => import('@/views/UserEditView/UserEditView.vue');
+const UserEditView = () => import('@/views/UserView/UserEditView.vue');
 const UserDetailsView = () => import('@/views/UserView/UserDetailsView.vue');
 
 const routes = [

@@ -11,6 +11,7 @@ export interface AuthUser {
   email: string
   role: 'ADMIN' | 'USER'
   profilePicturePath?: string | null
+  status: 'ACTIVE' | 'INACTIVE' | 'BANNED' | 'DELETED'
 }
 
 const STORAGE_KEY = 'auth_token'
@@ -56,6 +57,12 @@ export const useAuthStore = defineStore('auth', () => {
         headers: { Authorization: `Bearer ${t}` }
       })
       user.value = meResp.data
+
+      // ✅ Status prüfen
+      if (user.value.status !== 'ACTIVE') {
+        logout()
+        throw new Error(`Login nicht erlaubt: Benutzerstatus ${user.value.status}`)
+      }
 
       // 3. Token speichern
       if (payload.remember) localStorage.setItem(STORAGE_KEY, t)

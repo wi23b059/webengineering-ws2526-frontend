@@ -17,11 +17,11 @@ const emit = defineEmits<{
   >
     <div class="bg-gray-300 dark:bg-gray-700 rounded-lg p-6 w-full max-w-sm shadow-lg">
       <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-        Produkt löschen
+        Benutzer löschen
       </h2>
 
       <p class="text-sm text-gray-600 dark:text-gray-300 mb-6">
-        Möchtest du dieses Produkt wirklich löschen? Dieser Vorgang kann nicht rückgängig gemacht werden.
+        Möchtest du diesen Benutzer wirklich löschen? Dieser Vorgang kann nicht rückgängig gemacht werden.
       </p>
 
       <div class="flex justify-end space-x-3">

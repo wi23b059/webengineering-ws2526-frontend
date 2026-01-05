@@ -114,9 +114,7 @@ export const useProductStore = defineStore('product', () => {
 
       // Vollständige Bild-URLs setzen
       products.value.forEach(p => {
-        console.log("Vorher: " + p.imagePath);
         p.imagePath = `${API_BASE_URL}/api/files/${p.imagePath}`
-        console.log("Nachher: " + p.imagePath);
       })
 
     } finally {

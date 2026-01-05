@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, reactive } from 'vue'
 import api from '../services/api'
 import type { AxiosError } from 'axios'
+import { useAuthStore } from './authStore'
 
 export type Salutation = 'MR' | 'MS' | 'MRS' | 'MX'
 export type Role = 'USER' | 'ADMIN'
@@ -38,10 +39,20 @@ export const useUserStore = defineStore('user', () => {
     status: 'ACTIVE'
   })
 
+  const password = ref<string>('')
   const otherSalutation = ref('')
   const loading = ref(false)
   const successMessage = ref('')
   const errorMessage = ref('')
+  const users = ref<User[]>([])
+
+  interface AdminUpdatePayload extends Partial<User> {
+    password?: string
+  }
+
+  interface UserUpdatePayload extends Partial<User> {
+    password?: string
+  }
 
   // Daten laden
   async function loadUser(userId: string, token: string) {
@@ -69,22 +80,51 @@ export const useUserStore = defineStore('user', () => {
     successMessage.value = ''
     errorMessage.value = ''
 
-    const payload = {
-      salutation: user.salutation,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      countryCode: user.countryCode,
-      address: user.address,
-      zip: user.zip,
-      city: user.city,
-    }
+    const authStore = useAuthStore()
 
     try {
-      const resp = await api.put(`/api/users/${user.id}`, payload, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      let resp
+      if (authStore.isAdmin) {
+        // Admin-Payload
+        const payload: AdminUpdatePayload = {
+          salutation: user.salutation,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          countryCode: user.countryCode,
+          address: user.address,
+          zip: user.zip,
+          city: user.city,
+          email: user.email,
+          username: user.username,
+          role: user.role,
+          status: user.status,
+          password: password.value || undefined // Passwort optional
+        }
+
+        resp = await api.put(`/api/users/admin/${user.id}`, payload, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+      } else {
+        // Normaler User
+        const payload: UserUpdatePayload = {
+          salutation: user.salutation,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          countryCode: user.countryCode,
+          address: user.address,
+          zip: user.zip,
+          city: user.city,
+          password: password.value || undefined // Passwort optional
+        }
+
+        resp = await api.put(`/api/users/${user.id}`, payload, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+      }
+
       Object.assign(user, resp.data)
       successMessage.value = 'Änderungen erfolgreich gespeichert.'
+
     } catch (err: unknown) {
       console.error(err)
 
@@ -161,8 +201,49 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
+  async function fetchUsers(token: string) {
+    loading.value = true
+    errorMessage.value = ''
+    try {
+      const resp = await api.get('/api/users', {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      users.value = resp.data
+    } catch {
+      errorMessage.value = 'Benutzer konnten nicht geladen werden.'
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function deleteUserById(userId: string, token: string) {
+    await api.delete(`/api/users/${userId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    users.value = users.value.filter(u => u.id !== userId)
+  }
+
+  async function fetchUserById(userId: string, token: string) {
+    loading.value = true
+    errorMessage.value = ''
+
+    try {
+      const resp = await api.get<User>(`/api/users/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+
+      Object.assign(user, resp.data)
+    } catch (err) {
+      console.error(err)
+      errorMessage.value = 'Benutzerdetails konnten nicht geladen werden.'
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     user,
+    users,
     otherSalutation,
     loading,
     successMessage,
@@ -170,6 +251,10 @@ export const useUserStore = defineStore('user', () => {
     loadUser,
     saveUser,
     deleteUser,
-    createUser
+    createUser,
+    fetchUsers,
+    deleteUserById,
+    fetchUserById,
+    password,
   }
 })
