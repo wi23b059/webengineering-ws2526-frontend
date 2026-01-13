@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
 import { useAuthStore } from '@/stores/authStore'
+import { API_BASE_URL } from '@/services/api'
 
 const route = useRoute()
 const router = useRouter()
@@ -13,7 +14,7 @@ const token = authStore.token
 onMounted(async () => {
   // Schritt 2a: AuthUser laden
   if (!authStore.user && token) {
-    await authStore.fetchMe()   // <-- hier await hinzufügen
+    await authStore.fetchMe() // <-- hier await hinzufügen
   }
 
   // Schritt 2b: Userdaten laden
@@ -31,6 +32,23 @@ async function save() {
 function goBack() {
   router.push('/admin/users')
 }
+
+function onFileChange(event: Event) {
+  const target = event.target as HTMLInputElement
+  if (target.files && target.files.length > 0) {
+    userStore.profileFile = target.files[0]
+  }
+}
+
+const userImageUrl = computed(() => {
+  if (userStore.profileFile) {
+    return URL.createObjectURL(userStore.profileFile)
+  }
+  if (userStore.user.profilePicturePath) {
+    return userStore.getUserImageUrl(userStore.user)
+  }
+  return `${API_BASE_URL}/api/files/fallback.png`
+})
 </script>
 
 <template>
@@ -39,54 +57,72 @@ function goBack() {
       <h1 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Benutzer bearbeiten</h1>
 
       <!-- Success / Error -->
-      <div v-if="userStore.successMessage" class="mb-4 bg-green-100 border border-green-400 p-4 text-green-700 rounded">{{ userStore.successMessage }}</div>
-      <div v-if="userStore.errorMessage" class="mb-4 bg-red-100 border border-red-400 p-4 text-red-700 rounded">{{ userStore.errorMessage }}</div>
+      <div
+        v-if="userStore.successMessage"
+        class="mb-4 bg-green-100 border border-green-400 p-4 text-green-700 rounded"
+      >
+        {{ userStore.successMessage }}
+      </div>
+      <div
+        v-if="userStore.errorMessage"
+        class="mb-4 bg-red-100 border border-red-400 p-4 text-red-700 rounded"
+      >
+        {{ userStore.errorMessage }}
+      </div>
 
       <form class="grid grid-cols-1 md:grid-cols-2 gap-6" @submit.prevent="save">
-
         <!-- ID readonly -->
         <div>
           <label>ID</label>
-          <input type="text" v-model="userStore.user.id" readonly class="w-full p-2 border rounded bg-gray-100"/>
+          <input
+            type="text"
+            v-model="userStore.user.id"
+            readonly
+            class="w-full p-2 border rounded bg-gray-100"
+          />
         </div>
 
         <!-- Vorname / Nachname / Adresse / etc. -->
         <div>
           <label>Vorname</label>
-          <input type="text" v-model="userStore.user.firstName" class="w-full p-2 border rounded"/>
+          <input type="text" v-model="userStore.user.firstName" class="w-full p-2 border rounded" />
         </div>
         <div>
           <label>Nachname</label>
-          <input type="text" v-model="userStore.user.lastName" class="w-full p-2 border rounded"/>
+          <input type="text" v-model="userStore.user.lastName" class="w-full p-2 border rounded" />
         </div>
 
         <!-- Land / PLZ / Stadt / Adresse -->
         <div>
           <label>Land</label>
-          <input type="text" v-model="userStore.user.countryCode" class="w-full p-2 border rounded"/>
+          <input
+            type="text"
+            v-model="userStore.user.countryCode"
+            class="w-full p-2 border rounded"
+          />
         </div>
         <div>
           <label>Adresse</label>
-          <input type="text" v-model="userStore.user.address" class="w-full p-2 border rounded"/>
+          <input type="text" v-model="userStore.user.address" class="w-full p-2 border rounded" />
         </div>
         <div>
           <label>PLZ</label>
-          <input type="text" v-model="userStore.user.zip" class="w-full p-2 border rounded"/>
+          <input type="text" v-model="userStore.user.zip" class="w-full p-2 border rounded" />
         </div>
         <div>
           <label>Stadt</label>
-          <input type="text" v-model="userStore.user.city" class="w-full p-2 border rounded"/>
+          <input type="text" v-model="userStore.user.city" class="w-full p-2 border rounded" />
         </div>
 
         <!-- Admin-only Felder -->
         <div v-if="authStore.isAdmin">
           <label>Email</label>
-          <input type="email" v-model="userStore.user.email" class="w-full p-2 border rounded"/>
+          <input type="email" v-model="userStore.user.email" class="w-full p-2 border rounded" />
         </div>
 
         <div v-if="authStore.isAdmin">
           <label>Username</label>
-          <input type="text" v-model="userStore.user.username" class="w-full p-2 border rounded"/>
+          <input type="text" v-model="userStore.user.username" class="w-full p-2 border rounded" />
         </div>
 
         <div v-if="authStore.isAdmin">
@@ -115,9 +151,24 @@ function goBack() {
             placeholder="Neues Passwort eingeben"
             class="w-full p-2 border rounded"
           />
-          <p class="text-sm text-gray-500">Lassen Sie das Feld leer, wenn Sie das Passwort nicht ändern möchten.</p>
+          <p class="text-sm text-gray-500">
+            Lassen Sie das Feld leer, wenn Sie das Passwort nicht ändern möchten.
+          </p>
         </div>
 
+        <!-- Profilbild -->
+        <div class="md:col-span-2">
+          <label>Profilbild</label>
+          <input
+            type="file"
+            accept="image/*"
+            @change="onFileChange"
+            class="w-full p-2 border rounded"
+          />
+          <div v-if="profileFile || userStore.user.profilePicturePath" class="mt-2">
+            <img :src="userImageUrl" alt="Profilbild Vorschau" class="h-32 w-auto rounded" />
+          </div>
+        </div>
       </form>
 
       <div class="mt-6 flex gap-4">

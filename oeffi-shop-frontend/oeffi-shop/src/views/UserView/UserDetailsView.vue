@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
 
@@ -21,6 +21,10 @@ onMounted(async () => {
 function goToEdit() {
   router.push(`/admin/users/${route.params.id}`)
 }
+
+const profileImageUrl = computed(() => {
+  return userStore.getUserImageUrl(userStore.user)
+})
 </script>
 
 <template>
@@ -67,6 +71,11 @@ function goToEdit() {
             >
               {{ userStore.user.status }}
             </span>
+          </div>
+
+          <div v-if="profileImageUrl && profileImageUrl !== ''">
+            <span class="font-semibold">Profilbild:</span>
+            <img :src="profileImageUrl" class="mt-2 rounded max-h-48 border" alt="Profilbild" />
           </div>
 
           <!-- Aktionen -->

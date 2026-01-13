@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, reactive } from 'vue'
 import api from '../services/api'
+import { API_BASE_URL } from '@/services/api'
 import type { AxiosError } from 'axios'
 import { useAuthStore } from './authStore'
 
@@ -21,6 +22,7 @@ export interface User {
   username: string
   role: Role
   status: Status
+  profilePicturePath?: string
 }
 
 export const useUserStore = defineStore('user', () => {
@@ -45,6 +47,7 @@ export const useUserStore = defineStore('user', () => {
   const successMessage = ref('')
   const errorMessage = ref('')
   const users = ref<User[]>([])
+  const profileFile = ref<File>()
 
   interface AdminUpdatePayload extends Partial<User> {
     password?: string
@@ -83,6 +86,22 @@ export const useUserStore = defineStore('user', () => {
     const authStore = useAuthStore()
 
     try {
+      let profilePicturePath = user.profilePicturePath
+
+      if (profileFile.value) {
+        const formData = new FormData()
+        formData.append('file', profileFile.value)
+
+        const uploadResp = await api.post('/api/files/upload', formData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+          }
+        })
+
+        profilePicturePath = uploadResp.data // Server liefert Key oder Pfad
+      }
+
       let resp
       if (authStore.isAdmin) {
         // Admin-Payload
@@ -98,7 +117,8 @@ export const useUserStore = defineStore('user', () => {
           username: user.username,
           role: user.role,
           status: user.status,
-          password: password.value || undefined // Passwort optional
+          password: password.value || undefined, // Passwort optional
+          profilePicturePath // Profilbild optional
         }
 
         resp = await api.put(`/api/users/admin/${user.id}`, payload, {
@@ -114,7 +134,8 @@ export const useUserStore = defineStore('user', () => {
           address: user.address,
           zip: user.zip,
           city: user.city,
-          password: password.value || undefined // Passwort optional
+          password: password.value || undefined, // Passwort optional
+          profilePicturePath // Profilbild optional
         }
 
         resp = await api.put(`/api/users/${user.id}`, payload, {
@@ -184,7 +205,7 @@ export const useUserStore = defineStore('user', () => {
         password
       }
       const resp = await api.post('/api/users', payload)
-      Object.assign(user, resp.data) // ID und evtl. andere Felder übernehmen
+      Object.assign(user, resp.data) // ID und eventuell andere Felder übernehmen
       successMessage.value = 'Benutzer erfolgreich erstellt.'
       return true
     } catch (err: unknown) {
@@ -241,6 +262,11 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
+  function getUserImageUrl(user?: User | null) {
+    if (!user?.profilePicturePath) return '${API_BASE_URL}/api/files/fallback.png'
+    return `${API_BASE_URL}/api/files/${user.profilePicturePath}`
+  }
+
   return {
     user,
     users,
@@ -256,5 +282,7 @@ export const useUserStore = defineStore('user', () => {
     deleteUserById,
     fetchUserById,
     password,
+    getUserImageUrl,
+    profileFile,
   }
 })

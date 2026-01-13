@@ -1,12 +1,25 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, computed } from 'vue'
 import { useAuthStore } from '../../stores/authStore.ts'
 import { useUserStore } from '../../stores/userStore.ts'
 import { useRouter } from 'vue-router'
+import { API_BASE_URL } from '@/services/api.ts'
+import * as yup from 'yup'
+import { reactive } from 'vue'
+import { accountSchema } from '@/validation/accountSchema'
 
 const authStore = useAuthStore()
 const userStore = useUserStore()
 const router = useRouter()
+
+const passwordForm = reactive({
+  currentPassword: '',
+  newPassword: '',
+  repeatNewPassword: ''
+})
+
+type PasswordKeys = keyof typeof passwordForm
+const passwordErrors = reactive<Partial<Record<PasswordKeys, string>>>({})
 
 // Lade Daten beim Mount
 onMounted(async () => {
@@ -40,6 +53,23 @@ async function confirmDeleteUser() {
   authStore.logout()
   router.push('/login')
 }
+
+function onFileChange(event: Event) {
+  const target = event.target as HTMLInputElement
+  if (target.files && target.files.length > 0) {
+    userStore.profileFile = target.files[0]
+  }
+}
+
+const userImageUrl = computed(() => {
+  if (userStore.profileFile) {
+    return URL.createObjectURL(userStore.profileFile)
+  }
+  if (userStore.user.profilePicturePath) {
+    return userStore.getUserImageUrl(userStore.user)
+  }
+  return `${API_BASE_URL}/api/files/fallback.png`
+})
 </script>
 
 <template>
@@ -56,6 +86,31 @@ async function confirmDeleteUser() {
       </div>
 
       <form class="grid grid-cols-1 md:grid-cols-2 gap-6" @submit.prevent="saveUser">
+        <!-- Profilbild -->
+        <div class="md:col-span-2">
+          <label class="block mb-1 font-semibold text-gray-700 dark:text-gray-300">
+            Profilbild
+          </label>
+
+          <input
+            type="file"
+            accept="image/*"
+            @change="onFileChange"
+            class="w-full p-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700"
+          />
+
+          <div
+            v-if="userStore.profileFile || userStore.user.profilePicturePath"
+            class="mt-4"
+          >
+            <img
+              :src="userImageUrl"
+              alt="Profilbild Vorschau"
+              class="h-32 w-auto rounded-lg border border-gray-300 dark:border-gray-600"
+            />
+          </div>
+        </div>
+
         <!-- ID readonly -->
         <div>
           <label class="block mb-1 font-semibold text-gray-700 dark:text-gray-300">ID</label>
@@ -156,6 +211,80 @@ async function confirmDeleteUser() {
           Benutzerkonto löschen
         </button>
       </div>
+      <hr class="my-10 border-gray-300 dark:border-gray-600" />
+
+      <h2 class="text-xl font-semibold mb-6 text-gray-900 dark:text-white">
+        Passwort ändern
+      </h2>
+
+      <form
+        class="grid grid-cols-1 md:grid-cols-2 gap-6"
+        @submit.prevent="changePassword"
+      >
+        <!-- Aktuelles Passwort -->
+        <div class="md:col-span-2">
+          <label class="block mb-1 font-semibold text-gray-700 dark:text-gray-300">
+            Aktuelles Passwort
+          </label>
+          <input
+            v-model="passwordForm.currentPassword"
+            type="password"
+            autocomplete="current-password"
+            class="w-full p-2 rounded-lg border border-gray-300 dark:border-gray-600"
+          />
+          <p v-if="passwordErrors.currentPassword" class="text-red-500 text-sm mt-1">
+            {{ passwordErrors.currentPassword }}
+          </p>
+        </div>
+
+        <!-- Neues Passwort -->
+        <div>
+          <label class="block mb-1 font-semibold text-gray-700 dark:text-gray-300">
+            Neues Passwort
+          </label>
+          <input
+            v-model="passwordForm.newPassword"
+            type="password"
+            autocomplete="new-password"
+            class="w-full p-2 rounded-lg border border-gray-300 dark:border-gray-600"
+          />
+          <p v-if="passwordErrors.newPassword" class="text-red-500 text-sm mt-1">
+            {{ passwordErrors.newPassword }}
+          </p>
+        </div>
+
+        <!-- Passwort bestätigen -->
+        <div>
+          <label class="block mb-1 font-semibold text-gray-700 dark:text-gray-300">
+            Neues Passwort bestätigen
+          </label>
+          <input
+            v-model="passwordForm.repeatNewPassword"
+            type="password"
+            autocomplete="new-password"
+            class="w-full p-2 rounded-lg border border-gray-300 dark:border-gray-600"
+          />
+          <p
+            v-if="passwordErrors.repeatNewPassword"
+            class="text-red-500 text-sm mt-1"
+          >
+            {{ passwordErrors.repeatNewPassword }}
+          </p>
+        </div>
+
+        <!-- Submit -->
+        <div class="md:col-span-2">
+          <button
+            type="submit"
+            class="px-6 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg"
+          >
+            Passwort ändern
+          </button>
+        </div>
+      </form>
     </div>
   </section>
+
+
+
 </template>

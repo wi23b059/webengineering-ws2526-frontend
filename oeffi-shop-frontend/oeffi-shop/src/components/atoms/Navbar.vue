@@ -3,12 +3,15 @@ defineOptions({ name: 'SiteNavbar' });
 import { RouterLink, useRouter } from 'vue-router';
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
 import { useAuthStore } from '@/stores/authStore'
+import { useUserStore } from '@/stores/userStore'
+import { API_BASE_URL } from '@/services/api'
 
 const showDropdown = ref(false);
 const showProductsDropdown = ref(false)
 const showUsersDropdown = ref(false)
 const avatarWrapper = ref<HTMLElement | null>(null);
 const auth = useAuthStore()
+const userStore = useUserStore()
 const isLoggedIn = computed(() => auth.isAuthenticated)
 const isAdmin = computed(() => auth.user?.role === 'ADMIN')
 const router = useRouter()
@@ -16,9 +19,10 @@ const displayName = computed(() => auth.fullName)
 const email = computed(() => auth.user?.email)
 
 const avatarUrl = computed(() => {
-  return auth.user?.profilePicturePath
-    ? `/public/docs/${auth.user.profilePicturePath}`
-    : '/public/docs/test_1.png'
+  if (auth.user && userStore.user.profilePicturePath) {
+    return `${API_BASE_URL}/api/files/${userStore.user.profilePicturePath}`
+  }
+  return `${API_BASE_URL}/api/files/fallback.png`
 })
 
 function onLogout() {
