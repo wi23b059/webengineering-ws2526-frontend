@@ -267,6 +267,35 @@ export const useUserStore = defineStore('user', () => {
     return `${API_BASE_URL}/api/files/${user.profilePicturePath}`
   }
 
+  async function changePassword(
+    token: string,
+    currentPassword: string,
+    newPassword: string
+  ) {
+    loading.value = true
+    errorMessage.value = ''
+    successMessage.value = ''
+
+    try {
+      await api.put(
+        `/api/users/${user.id}/password`,
+        { currentPassword, newPassword },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      )
+
+      successMessage.value = 'Passwort wurde erfolgreich geändert.'
+    } catch (err: unknown) {
+      const axiosErr = err as AxiosError<{ message?: string }>
+      errorMessage.value =
+        axiosErr.response?.data?.message ??
+        'Passwort konnte nicht geändert werden.'
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     user,
     users,
@@ -284,5 +313,6 @@ export const useUserStore = defineStore('user', () => {
     password,
     getUserImageUrl,
     profileFile,
+    changePassword,
   }
 })

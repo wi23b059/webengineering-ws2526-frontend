@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { onMounted, computed } from 'vue'
-import { useAuthStore } from '../../stores/authStore.ts'
-import { useUserStore } from '../../stores/userStore.ts'
+import { useAuthStore } from '@/stores/authStore.ts'
+import { useUserStore } from '@/stores/userStore.ts'
 import { useRouter } from 'vue-router'
 import { API_BASE_URL } from '@/services/api.ts'
 import * as yup from 'yup'
 import { reactive } from 'vue'
 import { accountSchema } from '@/validation/accountSchema'
+import { passwordSchema } from '@/validation/passwordSchema'
 
 const authStore = useAuthStore()
 const userStore = useUserStore()
@@ -51,7 +52,7 @@ async function confirmDeleteUser() {
 
   // Nach erfolgreichem Löschen: Logout + Redirect
   authStore.logout()
-  router.push('/login')
+  await router.push('/login')
 }
 
 function onFileChange(event: Event) {
@@ -70,6 +71,40 @@ const userImageUrl = computed(() => {
   }
   return `${API_BASE_URL}/api/files/fallback.png`
 })
+
+async function changePassword() {
+  if (!authStore.token) return
+
+  // Fehler zurücksetzen
+  Object.keys(passwordErrors).forEach(
+    key => delete passwordErrors[key as PasswordKeys]
+  )
+
+  try {
+    await passwordSchema.validate(passwordForm, {
+      abortEarly: false
+    })
+
+    await userStore.changePassword(
+      authStore.token,
+      passwordForm.currentPassword,
+      passwordForm.newPassword
+    )
+
+    // Felder leeren
+    passwordForm.currentPassword = ''
+    passwordForm.newPassword = ''
+    passwordForm.repeatNewPassword = ''
+  } catch (err) {
+    if (err instanceof yup.ValidationError) {
+      err.inner.forEach(e => {
+        if (e.path) {
+          passwordErrors[e.path as PasswordKeys] = e.message
+        }
+      })
+    }
+  }
+}
 </script>
 
 <template>
@@ -94,7 +129,7 @@ const userImageUrl = computed(() => {
 
           <input
             type="file"
-            accept="image/*"
+            accept="image/png, image/jpeg, image/jpg, image/gif, image/webp"
             @change="onFileChange"
             class="w-full p-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700"
           />

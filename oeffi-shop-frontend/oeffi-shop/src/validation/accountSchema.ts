@@ -58,37 +58,4 @@ export const accountSchema = yup.object({
     .string()
     .nullable()
     .max(255, 'Profilbildpfad darf maximal 255 Zeichen lang sein'),
-
-  /* -----------------------------
-   * Passwort ändern (optional)
-   * ----------------------------- */
-
-  currentPassword: yup
-    .string()
-    .when('newPassword', {
-      is: (val: string) => !!val,
-      then: schema => schema.required('Aktuelles Passwort ist erforderlich'),
-      otherwise: schema => schema.notRequired()
-    }),
-
-  newPassword: yup
-    .string()
-    .nullable()
-    .transform(v => (v === '' ? null : v))
-    .matches(
-      /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{8,}$/,
-      'Mindestens 8 Zeichen, eine Zahl, ein Groß- und Kleinbuchstabe'
-    )
-    .notRequired(),
-
-  repeatNewPassword: yup
-    .string()
-    .when('newPassword', {
-      is: (val: string) => !!val,
-      then: schema =>
-        schema
-          .required('Bitte Passwort bestätigen')
-          .oneOf([yup.ref('newPassword')], 'Passwörter müssen übereinstimmen'),
-      otherwise: schema => schema.notRequired()
-    })
 })

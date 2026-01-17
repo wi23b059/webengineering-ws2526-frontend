@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import Heading from '@/components/atoms/Heading.vue';
 import NewsCard from '@/components/atoms/NewsCard.vue';
 import { news } from '@/docs/news';

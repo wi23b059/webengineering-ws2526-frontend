@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
 import DeleteUserModal from '@/components/atoms/DeleteUserModal.vue'
@@ -9,6 +9,10 @@ const router = useRouter()
 
 const showDeleteModal = ref(false)
 const userToDeleteId = ref<string | null>(null)
+
+const searchQuery = ref('')
+const sortKey = ref<keyof typeof userStore.user | null>(null)
+const sortDirection = ref<'asc' | 'desc'>('asc')
 
 // Beispiel: Token kommt evtl. aus Auth-Store
 const token =
@@ -41,6 +45,44 @@ async function confirmDelete() {
   showDeleteModal.value = false
   userToDeleteId.value = null
 }
+
+const filteredAndSortedUsers = computed(() => {
+  let result = [...userStore.users]
+
+  // 🔍 Suche über alle Felder
+  if (searchQuery.value.trim()) {
+    const q = searchQuery.value.toLowerCase()
+
+    result = result.filter(user =>
+      Object.values(user).some(value =>
+        String(value).toLowerCase().includes(q)
+      )
+    )
+  }
+
+  // ↕️ Sortierung
+  if (sortKey.value) {
+    result.sort((a, b) => {
+      const aVal = String(a[sortKey.value] ?? '').toLowerCase()
+      const bVal = String(b[sortKey.value] ?? '').toLowerCase()
+
+      if (aVal < bVal) return sortDirection.value === 'asc' ? -1 : 1
+      if (aVal > bVal) return sortDirection.value === 'asc' ? 1 : -1
+      return 0
+    })
+  }
+
+  return result
+})
+
+function sortBy(key: keyof typeof userStore.user) {
+  if (sortKey.value === key) {
+    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
+  } else {
+    sortKey.value = key
+    sortDirection.value = 'asc'
+  }
+}
 </script>
 
 <template>
@@ -72,6 +114,13 @@ async function confirmDelete() {
           {{ userStore.errorMessage }}
         </div>
 
+        <input
+          v-model="searchQuery"
+          type="text"
+          placeholder="Suchen nach ID, Name, E-Mail, Rolle, Status ..."
+          class="mb-4 w-full p-2 rounded-lg border border-gray-300 dark:border-gray-600"
+        />
+
         <!-- Tabelle -->
         <div class="overflow-x-auto">
           <table
@@ -79,21 +128,21 @@ async function confirmDelete() {
           >
             <thead class="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white">
             <tr>
-              <th class="px-4 py-2 border">ID</th>
-              <th class="px-4 py-2 border">Anrede</th>
-              <th class="px-4 py-2 border">Vorname</th>
-              <th class="px-4 py-2 border">Nachname</th>
-              <th class="px-4 py-2 border">E-Mail</th>
-              <th class="px-4 py-2 border">Username</th>
-              <th class="px-4 py-2 border">Rolle</th>
-              <th class="px-4 py-2 border">Status</th>
+              <th class="px-4 py-2 border cursor-pointer select-none" @click="sortBy('id')">ID</th>
+              <th class="px-4 py-2 border cursor-pointer select-none" @click="sortBy('salutation')">Anrede</th>
+              <th class="px-4 py-2 border cursor-pointer select-none" @click="sortBy('firstName')">Vorname</th>
+              <th class="px-4 py-2 border cursor-pointer select-none" @click="sortBy('lastName')">Nachname</th>
+              <th class="px-4 py-2 border cursor-pointer select-none" @click="sortBy('email')">E-Mail</th>
+              <th class="px-4 py-2 border cursor-pointer select-none" @click="sortBy('username')">Username</th>
+              <th class="px-4 py-2 border cursor-pointer select-none" @click="sortBy('role')">Rolle</th>
+              <th class="px-4 py-2 border cursor-pointer select-none" @click="sortBy('status')">Status</th>
               <th class="px-4 py-2 border">Aktionen</th>
             </tr>
             </thead>
 
             <tbody>
             <tr
-              v-for="u in userStore.users"
+              v-for="u in filteredAndSortedUsers"
               :key="u.id"
               class="hover:bg-gray-50 dark:hover:bg-gray-700"
             >
