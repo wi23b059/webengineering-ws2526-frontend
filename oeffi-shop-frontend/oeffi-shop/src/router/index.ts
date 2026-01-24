@@ -16,6 +16,8 @@ const ProductDetailsView = () => import('@/views/ProductView/ProductDetailsView.
 const UserAdministrationView = () => import('@/views/UserView/UserAdministrationView.vue');
 const UserEditView = () => import('@/views/UserView/UserEditView.vue');
 const UserDetailsView = () => import('@/views/UserView/UserDetailsView.vue');
+const CartView = () => import('@/views/OrderView/CartView.vue');
+const CheckoutView = () => import('@/views/OrderView/CheckoutView.vue');
 
 const routes = [
   {
@@ -108,6 +110,16 @@ const routes = [
       requiresAuth: true,
       requiresAdmin: true,
     },
+  },
+  {
+    path: '/cart',
+    name: 'CartView',
+    component: CartView,
+  },
+  {
+    path: '/checkout',
+    name: 'CheckoutView',
+    component: CheckoutView,
   },
   {
     path: '/imprint',

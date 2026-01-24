@@ -3,7 +3,9 @@ import { ref, reactive } from 'vue'
 import * as yup from 'yup'
 import type { ValidationError } from 'yup'
 import { useRouter } from 'vue-router'
+import api from '@/services/api'
 import { useAuthStore } from '@/stores/authStore.ts'
+import { useCartStore } from '@/stores/cartStore'
 
 // Felder
 const emailOrUsername = ref('')
@@ -26,6 +28,13 @@ const loginSchema = yup.object({
 
 const router = useRouter()
 const auth = useAuthStore()
+
+const localCartItems = JSON.parse(
+  localStorage.getItem('cart') ?? '[]'
+).map((i: any) => ({
+  productId: i.productId,
+  quantity: i.quantity
+}))
 
 async function onSubmit() {
   // reset errors
@@ -51,6 +60,21 @@ async function onSubmit() {
 
     if (res.ok) {
       successMessage.value = 'Erfolgreich eingeloggt 🎉'
+      const cart = useCartStore()
+
+      // 1️⃣ DB Cart laden
+      await cart.fetchCartFromBackend()
+
+      if (cart.items.length === 0 && localCartItems.length > 0) {
+        // 2️⃣ DB leer → LocalCart übernehmen
+        const resp = await api.post('/api/cart/replace', localCartItems)
+        cart.items = resp.data
+      }
+
+      // 3️⃣ LocalStorage löschen
+      localStorage.removeItem('cart')
+
+      // Weiterleitung
       setTimeout(() => {
         router.push({ name: 'HomeView' }).catch(() => {})
       }, 1200)

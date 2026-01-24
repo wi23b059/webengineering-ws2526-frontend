@@ -57,6 +57,7 @@ function changeCategory(id: number | null) {
         <ProductCard
           v-for="p in store.products"
           :key="p.id"
+          :id="p.id"
           :image="p.imagePath"
         :category="p.categoryName"
         :title="p.name"

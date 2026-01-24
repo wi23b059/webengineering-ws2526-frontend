@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { RouterLink } from "vue-router";
+import { useCartStore } from '@/stores/cartStore'
+
+const cartStore = useCartStore()
 
 const props = defineProps({
+  id: Number,
   image: String,
   category: String,
   title: String,
@@ -14,6 +18,17 @@ const getImage = (filename?: string) => {
   if (!filename) return '/docs/fallback.png'
   return filename
 };
+
+const addToCart = () => {
+  if (!props.id || props.price == null) return
+
+  cartStore.addItem({
+    id: props.id,
+    name: props.title ?? '',
+    price: props.price,
+    imagePath: props.image
+  })
+}
 </script>
 
 <template>
@@ -68,8 +83,8 @@ const getImage = (filename?: string) => {
           {{ price.toFixed(2) }} €
         </span>
 
-        <RouterLink
-          :to="link"
+        <button
+          @click="addToCart"
           class="inline-flex items-center text-white bg-slate-700 hover:bg-slate-800
                  border border-transparent focus:ring-4 focus:ring-slate-300
                  shadow-sm font-medium rounded-lg text-sm px-3 py-2"
@@ -78,8 +93,8 @@ const getImage = (filename?: string) => {
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M5 4h1.5L9 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8.5-3h9.25L19 7H7.312"/>
           </svg>
-          Kaufen
-        </RouterLink>
+          In den Warenkorb
+        </button>
       </div>
     </div>
 

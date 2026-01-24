@@ -15,3 +15,7 @@ const auth = useAuthStore()
 auth.restoreFromStorage()
 
 app.mount('#app')
+
+import { useCartStore } from '@/stores/cartStore'
+const cart = useCartStore()
+await cart.initCart()
