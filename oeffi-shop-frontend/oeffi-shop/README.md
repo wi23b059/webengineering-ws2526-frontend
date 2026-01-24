@@ -1,48 +1,26 @@
-# oeffi-shop
+# oeffi-shop — Kurzdokumentation
 
-This template should help get you started developing with Vue 3 in Vite.
+## Kurzbeschreibung
+Eine kleine Vue 3 + Vite Shopping-Frontend-Applikation für Wiener Öffi-Tickets.  
+Backend-API wird unter `http://localhost:8081/api` erwartet.
 
-## Recommended IDE Setup
+## Technologie-Stack
+- Vue 3 (Composition API, `<script setup>`)
+- Vite
+- TypeScript
+- Axios für API-Calls
+- Tailwind CSS
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+## Wichtige Befehle
+- **Installation:** `npm install`
+- **Dev:** `npm run dev`
+- **Build:** `npm run build`
+- **Lint:** `npm run lint`
 
-## Recommended Browser Setup
-
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd) 
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
-
-## Type Support for `.vue` Imports in TS
-
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
-npm run dev
-```
-
-### Type-Check, Compile and Minify for Production
-
-```sh
-npm run build
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
+## Projektstruktur (Auszug)
+- `public/docs` — statische, vom Dev-Server servierte Bilder (öffentlicher Root: `/docs/...`)
+- `src/docs` — Bilder/Assets, die im Bundle landen können
+- `src/components/atoms/ProductCard.vue` — Produktkarte mit Bildloader
+- `src/views/HomeView.vue` — Anzeige der Produkte auf der Startseite
+- `src/services/api.ts` — API-Konfiguration / helper
+- `src/stores/*` — Pinia Stores (Produkte, Warenkorb, User, ...)
