@@ -131,6 +131,7 @@ onBeforeUnmount(() => {
             </div>
           </li>
           <li v-if="isLoggedIn && isAdmin"><RouterLink to="/admin/users" class="py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white">Benutzerübersicht</RouterLink></li>
+          <li v-if="isLoggedIn && isAdmin"><RouterLink to="/admin/orders" class="py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white">Bestellübersicht</RouterLink></li>
         </ul>
       </div>
 
@@ -170,7 +171,7 @@ onBeforeUnmount(() => {
             </div>
             <ul class="py-2" aria-labelledby="user-menu-button">
               <li><RouterLink to="/user-account" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200">Mein Profil</RouterLink></li>
-              <li><RouterLink to="/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200">Bestellungen</RouterLink></li>
+              <li><RouterLink to="/orders" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200">Bestellungen</RouterLink></li>
               <li>
                 <button
                   @click="onLogout"

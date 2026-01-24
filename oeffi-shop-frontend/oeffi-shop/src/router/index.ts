@@ -18,6 +18,10 @@ const UserEditView = () => import('@/views/UserView/UserEditView.vue');
 const UserDetailsView = () => import('@/views/UserView/UserDetailsView.vue');
 const CartView = () => import('@/views/OrderView/CartView.vue');
 const CheckoutView = () => import('@/views/OrderView/CheckoutView.vue');
+const UserOrdersView = () => import('@/views/OrderView/UserOrdersView.vue')
+const AdminOrdersView = () => import('@/views/OrderView/AdminOrdersView.vue')
+const UserOrderDetailsView = () => import('@/views/OrderView/UserOrderDetailsView.vue')
+const AdminOrderDetailsView = () => import('@/views/OrderView/AdminOrderDetailsView.vue')
 
 const routes = [
   {
@@ -120,6 +124,42 @@ const routes = [
     path: '/checkout',
     name: 'CheckoutView',
     component: CheckoutView,
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
+    path: '/orders',
+    name: 'UserOrdersView',
+    component: UserOrdersView,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/admin/orders',
+    name: 'AdminOrdersView',
+    component: AdminOrdersView,
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: true
+    }
+  },
+  {
+    path: '/orders/:id',
+    name: 'UserOrderDetailsView',
+    component: UserOrderDetailsView,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/admin/orders/:id',
+    name: 'AdminOrderDetailsView',
+    component: AdminOrderDetailsView,
+    meta: {
+      requiresAuth: true
+    }
   },
   {
     path: '/imprint',
